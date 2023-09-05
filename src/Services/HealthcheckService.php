@@ -124,6 +124,7 @@ class HealthcheckService
     }
 
     /**
+     * Stub for success
      * @param null|string $kw
      * @return string
      * @throws GuzzleException
@@ -134,7 +135,7 @@ class HealthcheckService
     }
 
     /**
-     * @param null|string $kw
+     * @param null|string $kw Fallback message to use when there's no last message
      * @return string
      * @throws GuzzleException
      */
