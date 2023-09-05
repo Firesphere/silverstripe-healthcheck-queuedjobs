@@ -1,0 +1,5 @@
+---
+name: Healthyjobs
+---
+Firesphere\HealthcheckJobs\Services\HealthcheckService:
+  api_version: 3
