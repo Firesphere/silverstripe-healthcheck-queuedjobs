@@ -1,0 +1,14 @@
+---
+Name: healthycrontask
+After: 'crontask'
+---
+SilverStripe\Dev\DevelopmentAdmin:
+  registered_controllers:
+    cron:
+      controller: Firesphere\HealthcheckJobs\Controllers\HealthcheckCronTaskController
+      links:
+        cron: 'Run registered SilverStripe cron tasks and report to your Healthchecks instance'
+
+SilverStripe\Control\Director:
+  rules:
+    'dev/cron/$Action': Firesphere\HealthcheckJobs\Controllers\HealthcheckCronTaskController

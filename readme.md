@@ -2,6 +2,7 @@
 
 You can either self-host healthchecks, or create an account at healthchecks.io
 
+If no title is set, the classname will be used as title.
 
 ## Configuration:
 
@@ -33,7 +34,7 @@ public function getGrace()
 ## Add a cron formatted schedule
 
 ```php
-public function getCron()
+public function getSchedule()
 {
     return '*/5 * * * *'; // A valid cron schedule
 }

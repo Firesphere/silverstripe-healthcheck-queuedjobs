@@ -11,6 +11,7 @@
     ],
     "require": {
         "symbiote/silverstripe-queuedjobs": "^5.0|^4.0",
-        "guzzlehttp/guzzle": ">=6"
+        "guzzlehttp/guzzle": ">=6",
+        "silverstripe/crontask": "^3|^2"
     }
 }

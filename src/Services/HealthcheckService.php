@@ -5,6 +5,7 @@ namespace Firesphere\HealthcheckJobs\Services;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use SilverStripe\Core\Config\Configurable;
+use SilverStripe\CronTask\Interfaces\CronTask;
 use Symbiote\QueuedJobs\DataObjects\QueuedJobDescriptor;
 
 class HealthcheckService
@@ -27,10 +28,18 @@ class HealthcheckService
      * @var int
      */
     protected static $api_version;
+
     /**
-     * @var QueuedJobDescriptor
+     * @var string[]
      */
-    protected $job;
+    protected static $versions = [
+        1 => 'api/v1/checks/',
+        3 => 'api/v3/checks/'
+    ];
+    /**
+     * @var CronTask|QueuedJobDescriptor
+     */
+    protected $task;
     /**
      * @var string Ping endpoint on the healthcheck service
      */
@@ -41,12 +50,12 @@ class HealthcheckService
     protected $client;
 
     /**
-     * @param QueuedJobDescriptor $job
+     * @param null|QueuedJobDescriptor $job
      * @param string $endpoint
      * @param string $key
      * @throws GuzzleException
      */
-    public function __construct(QueuedJobDescriptor $job, string $endpoint, string $key)
+    public function __construct(?QueuedJobDescriptor $job, string $endpoint, string $key)
     {
         $this->client = new Client([
             'base_uri' => $endpoint,
@@ -54,7 +63,9 @@ class HealthcheckService
                 'X-Api-Key' => $key
             ]
         ]);
-        $this->job = $job;
+        if ($job) {
+            $this->task = $job;
+        }
         $this->getCheck();
     }
 
@@ -64,26 +75,24 @@ class HealthcheckService
      */
     private function getCheck(): void
     {
-        $versions = [
-            1 => 'api/v1/checks/',
-            3 => 'api/v3/checks/'
-        ];
         $v = $this->config()->get('api_version');
-        $check = $versions[$v];
-        $name = $this->job->getTitle();
+        $check = self::$versions[$v];
+        $name = get_class($this->task);
+        if (method_exists($this->task, 'getTitle')) {
+            $name = $this->task->getTitle();
+        }
 
         $json = [
             'name'   => $name,
             "unique" => ['name']
         ];
-        if (method_exists($this->job, 'getTimeout')) {
-            $json['timeout'] = $this->job->getTimeout();
-        }
-        if (method_exists($this->job, 'getGrace')) {
-            $json['grace'] = $this->job->getGrace();
-        }
-        if (method_exists($this->job, 'getCron')) {
-            $json['schedule'] = $this->job->getCron();
+        if (method_exists($this->task, 'getTimeout')) {
+            $json['timeout'] = $this->task->getTimeout();
+            if (method_exists($this->task, 'getGrace')) {
+                $json['grace'] = $this->task->getGrace();
+            }
+        } elseif (method_exists($this->task, 'getSchedule')) {
+            $json['schedule'] = $this->task->getSchedule();
         }
         $result = $this->client->post($check, [
             'json' => $json
@@ -104,7 +113,10 @@ class HealthcheckService
         self::$endpoint = self::config()->get('endpoint');
 
         self::$api_key = self::config()->get('api_key');
-        $job = QueuedJobDescriptor::get_by_id($jobId);
+        $job = null;
+        if ($jobId > 0) {
+            $job = QueuedJobDescriptor::get_by_id($jobId);
+        }
 
         return new self($job, self::$endpoint, self::$api_key);
     }
@@ -141,7 +153,7 @@ class HealthcheckService
      */
     public function ping(?string $kw = null): string
     {
-        $message = $this->job->getLastMessage() ?? $kw;
+        $message = $this->task->getLastMessage() ?? $kw;
         $result = $this->client->post($this->pingUrl, ['body' => $message]);
 
         return $result->getBody()->getContents();
@@ -155,7 +167,7 @@ class HealthcheckService
     public function fail(?string $payload = null): string
     {
         if (!$payload) {
-            $payload = $this->job->getLastMessage();
+            $payload = $this->task->getLastMessage();
         }
         $target = sprintf('%s/%s', rtrim($this->pingUrl, '/'), 'fail');
 
@@ -165,19 +177,19 @@ class HealthcheckService
     }
 
     /**
-     * @return QueuedJobDescriptor
+     * @return CronTask|QueuedJobDescriptor
      */
-    public function getJob(): QueuedJobDescriptor
+    public function getTask(): CronTask|QueuedJobDescriptor
     {
-        return $this->job;
+        return $this->task;
     }
 
     /**
-     * @param QueuedJobDescriptor $job
+     * @param CronTask|QueuedJobDescriptor $task
      * @return void
      */
-    public function setJob(QueuedJobDescriptor $job): void
+    public function setTask(CronTask|QueuedJobDescriptor $task): void
     {
-        $this->job = $job;
+        $this->task = $task;
     }
 }
