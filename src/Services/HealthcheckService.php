@@ -75,6 +75,9 @@ class HealthcheckService
      */
     private function getCheck(): void
     {
+        if (!$this->task) {
+            return;
+        }
         $v = $this->config()->get('api_version');
         $check = self::$versions[$v];
         $name = get_class($this->task);
@@ -128,6 +131,10 @@ class HealthcheckService
      */
     public function start(?string $kw = ''): string
     {
+        if (!$this->task) {
+            return '';
+        }
+
         $message = $kw ?? date('Y-m-d H:i:s');
         $target = sprintf('%s/%s', rtrim($this->pingUrl, '/'), 'start');
         $result = $this->client->post($target, ['body' => $message]);
@@ -153,6 +160,10 @@ class HealthcheckService
      */
     public function ping(?string $kw = null): string
     {
+        if (!$this->task) {
+            return '';
+        }
+
         $message = $this->task->getLastMessage() ?? $kw;
         $result = $this->client->post($this->pingUrl, ['body' => $message]);
 
@@ -166,6 +177,10 @@ class HealthcheckService
      */
     public function fail(?string $payload = null): string
     {
+        if (!$this->task) {
+            return '';
+        }
+
         if (!$payload) {
             $payload = $this->task->getLastMessage();
         }
@@ -187,9 +202,11 @@ class HealthcheckService
     /**
      * @param CronTask|QueuedJobDescriptor $task
      * @return void
+     * @throws GuzzleException
      */
     public function setTask(CronTask|QueuedJobDescriptor $task): void
     {
         $this->task = $task;
+        $this->getCheck();
     }
 }
