@@ -164,7 +164,7 @@ class HealthcheckService
             return '';
         }
 
-        $message = $this->task->getLastMessage() ?? $kw;
+        $message = $kw . $this->task->getLastMessage();
         $result = $this->client->post($this->pingUrl, ['body' => $message]);
 
         return $result->getBody()->getContents();
