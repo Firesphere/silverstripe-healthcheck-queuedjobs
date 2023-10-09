@@ -78,7 +78,7 @@ class HealthcheckService
         if (!$this->task) {
             return;
         }
-        $v = $this->config()->get('api_version');
+        $v = self::config()->get('api_version');
         $check = self::$versions[$v];
         $name = get_class($this->task);
         if (method_exists($this->task, 'getTitle')) {
@@ -113,9 +113,9 @@ class HealthcheckService
      */
     public static function init(int $jobId): self
     {
-        self::$endpoint = self::config()->get('endpoint');
+        self::$endpoint = self::config()->get('endpoint') ?? '';
 
-        self::$api_key = self::config()->get('api_key');
+        self::$api_key = self::config()->get('api_key') ?? '';
         $job = null;
         if ($jobId > 0) {
             $job = QueuedJobDescriptor::get_by_id($jobId);
@@ -131,7 +131,7 @@ class HealthcheckService
      */
     public function start(?string $kw = ''): string
     {
-        if (!$this->task) {
+        if (!$this->task || !self::$endpoint || !self::$api_key) {
             return '';
         }
 
@@ -160,7 +160,7 @@ class HealthcheckService
      */
     public function ping(?string $kw = null): string
     {
-        if (!$this->task) {
+        if (!$this->task || !self::$endpoint || !self::$api_key) {
             return '';
         }
 
@@ -177,7 +177,7 @@ class HealthcheckService
      */
     public function fail(?string $payload = null): string
     {
-        if (!$this->task) {
+        if (!$this->task || !self::$endpoint || !self::$api_key) {
             return '';
         }
 
