@@ -1,5 +1,7 @@
 # Healthchecks enabled Silverstripe Queued Jobs
 
+[GPL v3 or later](LICENSE.md)
+
 You can either self-host healthchecks, or create an account at healthchecks.io
 
 If no title is set, the classname will be used as title.
