@@ -6,7 +6,9 @@ use GuzzleHttp\Exception\GuzzleException;
 use Symbiote\QueuedJobs\Services\QueuedJobService;
 
 /**
+ * Class \Firesphere\HealthcheckJobs\Services\HealthcheckQueuedJobService
  *
+ * @package Firesphere\HealthcheckJobs
  */
 class HealthcheckQueuedJobService extends QueuedJobService
 {

@@ -8,6 +8,11 @@ use SilverStripe\Core\Config\Configurable;
 use SilverStripe\CronTask\Interfaces\CronTask;
 use Symbiote\QueuedJobs\DataObjects\QueuedJobDescriptor;
 
+/**
+ * Class \Firesphere\HealthcheckJobs\Services\HealthcheckService
+ *
+ * @package Firesphere\HealthcheckJobs
+ */
 class HealthcheckService
 {
 

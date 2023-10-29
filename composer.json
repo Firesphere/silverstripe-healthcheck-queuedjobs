@@ -2,7 +2,7 @@
     "name": "firesphere/healthcheckjobs",
     "description": "Run symbiote/queuedjobs, and ping a Healthchecks.io endpoint for start/finish/failure",
     "minimum-stability": "stable",
-    "license": "BSD-3-Clause",
+    "license": "GPL-3.0-or-later",
     "authors": [
         {
             "name": "simonerkelens",

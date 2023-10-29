@@ -11,6 +11,7 @@ use SilverStripe\CronTask\Interfaces\CronTask;
 /**
  * Class \Firesphere\HealthcheckJobs\Controllers\HealthcheckCronTaskController
  *
+ * @package Firesphere\HealthcheckJobs
  */
 class HealthcheckCronTaskController extends CronTaskController
 {
